@@ -20,7 +20,15 @@ NOTE: _We do recommend that you or your developers have some familiarity with th
 
 ### Cost Analysis
 
-[TODO] Get cost analysis from Andy.
+Running even a tiny traditional CMS like Wordpress or Drupal will cost at least $20/mo in AWS. And that gives you almost no resources... any reasonable traffic will quickly max it out. It will also give you no redundancy. When you starting adding all of that together, you can easily spend $50/mo, $100/mo, or more running a scalable and highly available CMS infrastructure. Not to mention the setup time... if you're not an AWS expert, that could take you days or weeks to set up correctly.
+
+This Jekyll rocket platform is:
+- Turnkey to set up: Just run the Cloudformation template and it's built
+- Highly available out of the box: CloudFront is as highly available as it gets. There are something like 50 CloudFront regions.
+- Massively scalable: With no effort, you get essentially unlimited scalability. Really.
+- Costs pennies. Well, maybe dollars if you're hugely successful. Let's say your app had 1M page views/mo. Yes, 1M. Assume that each page view makes 15 HTTP requests, and that the whole page is 50k. With CloudFront, you'd pay for 50GB of transfer and 15M requests. That would cost about $15/mo for the US, a bit more in other countries. As long as your caching is reasonable, the S3 costs would be trivial because CloudFront would rarely have to request new files.
+
+So just to review, that's $15/mo to serve up 1M page views per month on a massively scalable and highly available system.
 
 ### Batteries Included
 
