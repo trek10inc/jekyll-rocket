@@ -70,7 +70,7 @@ You don't want a blazing fast website that breaks sound barriers. We get it, you
 
 ## QuickStart Guide
 
-Checkout the [QuickStart Guide to get yourself](../blob/master/quickstart_guide.md) up and running in minutes.
+Checkout the [QuickStart Guide to get yourself](../master/quickstart_guide.md) up and running in minutes.
 
 ## Need Help?
 
