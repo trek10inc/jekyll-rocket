@@ -49,7 +49,6 @@ We even baked in the concept of staging and production websites. Now you can fin
   - Amazon Web Services (AWS)
     - S3
     - Cloudfront
-  - GitHub Pages
   - Wercker (Optional)
 
 ### Built on the Shoulders of Kind Giants  
@@ -71,29 +70,22 @@ You don't want a blazing fast website that breaks sound barriers. We get it, you
 
 ## QuickStart Guide
 
-Don't like reading boring text (We really tried to make it more entertaining than your average car manual, but we get it.) or confused about which button to click?  
-  
-Check out our Screencast that covers the full setup and deployment process. Vagrant. AWS. Jekyll. Making your coffee for that late night website editing binge. You get the idea.
-
-
-## Other Resources
-
+Checkout the [QuickStart Guide to get yourself](../blob/master/quickstart_guide.md) up and running in minutes.
 
 ## Need Help?
 
-Reach out to rocketplatform@trek10.com
+Reach out to jshort@trek10.com  
 Create a GitHub issue
 
-## The Book of TODO (aka: We should do this, but wouldn't complain if someone else did)
+## TODO (aka: We should do this, but wouldn't complain if someone else did)
 
-- ReadMe
-- QuickStart Guide
-- Default Theme
-- Image Optmization Options
+
+- Image Optmization / Sane Default Configs
 - Screencast
   - Vagrant
   - AWS (Should we look at other providers? Digital Ocean / Cloudflare? Dropbox?)
   - Jekyll
+- Easy Theme Selector / Setup?
 
 
 ## Contributing
