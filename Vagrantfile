@@ -6,8 +6,8 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  config.vm.box = "ffuenf/ubuntu-14.04.2-server-amd64"
-  config.vm.synced_folder ".", "/vagrant/website", :mount_options => ['dmode=774','fmode=775']
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.synced_folder ".", "/jekyll", :mount_options => ['dmode=774','fmode=775']
   config.vm.network "forwarded_port", guest: 4000, host: 4000
 
 
@@ -18,14 +18,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     echo "\n\nInstalling all the boring stuff..."
     sudo apt-get -y install build-essential git nodejs ruby1.9.3 default-jre
     gem install bundler
-    chown vagrant:vagrant /vagrant
-    cd /vagrant/website
+    chown vagrant:vagrant /jekyll
+    cd /jekyll
     bundle install
 
-    echo "\n\nCreating your new jekyll rocket website..."
-    jekyll new rocketpack-jekyll
-
+    if [ -d website ]; then
+      echo "\n\nExisting jekyll website detected, not creating a new one..."
+    else
+      echo "\n\nCreating a new jekyll website..."
+      jekyll new website
+    fi
+    
     echo "\n\nBuilding the rocket engines and strapping them onto your new site..."
+    cd /jekyll/website
+    rm -rf css _sass --verbose
+    cp -rf /jekyll/rocketpack-configs/* . --verbose
 
   SHELL
 

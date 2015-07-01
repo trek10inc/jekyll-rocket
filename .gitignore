@@ -33,3 +33,12 @@ build/
 
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
+
+# Ignore Gemfile.lock, we explictly set Jekyll Anyways
+Gemfile.lock
+
+# Ignore vagrant specific stuff
+.vagrant
+
+# Ignore created website
+website/
