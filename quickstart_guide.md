@@ -12,8 +12,8 @@ You can checkout the full getting started guide here: [Getting Started with Vagr
 
 Alternatively, here's are the cliffnotes version.  
 
-Download & Install VirtualBox Here
-Download & Install Vagrant Here
+[Download & Install VirtualBox Here](https://www.virtualbox.org/wiki/Downloads)  
+[Download & Install Vagrant Here](https://www.vagrantup.com/downloads.html)
 
 Once you have Vagrant up and running, we can get started with the real work!
 
@@ -25,7 +25,7 @@ Navigate to that directory and run
 This may take quite a while (30 minutes or longer) to setup everything, especially if you need to download the vagrant base vm box (which you will need to on your first vagrant up). You will also notice that it will create a new "website" directory in your current directory.
 
 Once everything is done ssh into your vagrant box  
-`vagrant ssh`
+`vagrant ssh`  
 *If this doesn't work and you are on windows, check out this [StackOverflow Thread](https://stackoverflow.com/questions/9885108/ssh-to-vagrant-box-in-windows).*
 
 
