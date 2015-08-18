@@ -18,6 +18,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     echo "\n\nInstalling all the boring stuff..."
     sudo apt-get -y install build-essential git nodejs ruby1.9.3 default-jre
     gem install bundler
+    gem install s3_website
     chown vagrant:vagrant /jekyll
     cd /jekyll
     bundle install
@@ -33,7 +34,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     cd /jekyll/website
     rm -rf css _sass --verbose
     cp -rf /jekyll/rocketpack-configs/* . --verbose
-
+    sudo cp /jekyll/rocketpack-configs/deploy-website.sh /usr/bin/deploy-website
+    sudo cp /jekyll/rocketpack-configs/develop-website.sh /usr/bin/develop-website
   SHELL
 
 end

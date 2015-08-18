@@ -1,0 +1,43 @@
+s3_id: AWS_ACCESS_KEY_ID
+s3_secret: AWS_SECRET_ACCESS_KEY
+s3_bucket: S3_BUCKET
+
+# If you are using cloudfront, enable them here by uncommenting
+# cloudfront_distribution_id: AWS_CLOUDFRONT_DISTRIBUTION
+# cloudfront_invalidate_root: true
+
+# Age is defined in seconds
+max_age:
+  "media/*": 25200       # Default to 1 week
+  "assets/*":  25200     # Default to 1 week
+  "generated/*": 25200   # Default to 1 week
+  "*": <%= 60 * 60 %>    # Default to caching for one hour
+
+# Stuff that should be gzipped before being delivered, speeds up page load times
+gzip:
+  - .html
+  - .css
+  - .js
+  - .png
+  - .jpg
+  - .svg
+  - .gif
+
+
+# Redirects are defined here, useful for migrations and not losing link juice
+redirects:
+  example-redirect-old-page/index.html: example-redirect-new-page/index.html
+
+
+# Don't need to upload all this stuff
+exclude_from_upload:
+  - Gemfile
+  - Gemfile.lock
+  - .md
+  - .gitignore
+  - .git
+  - .env
+  - .DS_Store
+  - .bundle
+  - .yml
+  - .rb

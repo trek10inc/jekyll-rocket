@@ -31,23 +31,39 @@ Once everything is done ssh into your vagrant box
 
 You will be greeted with some information from the Ubuntu system and a command line prompt.
 
-To startup the Jekyll server just run  
-`/jekyll/website/start_website.sh`
+To startup the Jekyll server just run in your terminal  
+`develop-website`
 
 If everything works well you should be able to go to [http://localhost:4000](http://localhost:4000) in any browser on your local machine and see a fresh jekyll install! Congrats! You are well on your way to a rocket powered Jekyll website!
 
+To stop the server (if you need to restart it, or you are done working) use CTRL+C
 
 ## Whenever you want to continue work on your website
 
+Just go to the directory with the vagrant file and repeat the steps:
 
+```
+vagrant up
+vagrant ssh
+develop-website
+```
 
 ## Setting up AWS 
 
+The easiest way to set things up in AWS to to use the provided CloudFormation template.
+Check out [CloudFormation ReadMe](../master/cloudformation-readme.md).
 
-## Setting up Wercker for One-Click Deploys & Builds
+## Deployments
 
-#### Still a Work in Progress
+Deploying can be done straight from the vagrant machine. We have included support for the brilliant s3_website, which handles many things like only updating changed / new files, managing cloudfront distributions, and even handling redirects.
 
-Todo:
-- Creating a staging & production workflow.
-- Using Environment Variables
+The config file can be found in the website/s3_website.yml of your generated site.
+You will need to edit a few different things, mostly to add your AWS secrets and keys. The config file is fairly self explanatory.
+
+After all of that is set, you simply need to run:
+`deploy-website`
+
+
+## That's all folks
+
+That's all there is, a few sets of commands and you are off and running with a Jekyll & S3 powered static website with minimal running cost and crazy high availability and practically infinite scaling.
