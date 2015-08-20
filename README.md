@@ -52,7 +52,6 @@ We even baked in the concept of staging and production websites. Now you can fin
   - Amazon Web Services (AWS)
     - S3
     - Cloudfront
-  - Wercker (Optional)
 
 ### Built on the Shoulders of Kind Giants  
 
@@ -77,7 +76,6 @@ Checkout the [QuickStart Guide to get yourself](../master/quickstart_guide.md) u
 
 ## Need Help?
 
-Reach out to jshort@trek10.com  
 Create a GitHub issue
 
 ## TODO (aka: We should do this, but wouldn't complain if someone else did)
@@ -86,9 +84,9 @@ Create a GitHub issue
 - Image Optmization / Sane Default Configs
 - Screencast
   - Vagrant
-  - AWS (Should we look at other providers? Digital Ocean / Cloudflare? Dropbox?)
+  - AWS
   - Jekyll
-- Easy Theme Selector / Setup?
+- Easy Theme Selector / Setup
 
 
 ## Contributing
