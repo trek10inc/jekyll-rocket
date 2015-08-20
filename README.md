@@ -1,6 +1,9 @@
 Jekyll Rocket
 ----------
 
+
+![Jekyll Rocket](jekyll_rocket_header.jpg?raw=true)
+
 A quickstart for building and deploying high performance static websites with Jekyll.  
 
 ## Why you should use Jekyll Rocket
