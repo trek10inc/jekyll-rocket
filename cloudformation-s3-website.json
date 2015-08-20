@@ -1,230 +1,483 @@
 {
-  "AWSTemplateFormatVersion" : "2010-09-09",
-
-  "Description" : "S3 & Cloudfront static website",
-
-  "Parameters" : {
-    "SiteURL" : {
-      "Description" : "URL for the Site",
-      "Type" : "String",
-      "Default" : "www.mysite.com",
-      "MinLength" : "1"
-      },
-    "redirectURL" : {
-      "Description" : "Optional URL to redirect to main URL. This is mainly used in production to redirect zone apex to www",
-      "Type" : "String",
-      "Default" : "mysite.com"
-      },
-    "CloudfrontSSLID" : {
-      "Description" : "ServerCertificateID of Cloudfront SSL Cert. See documentation",
-      "Type" : "String",
-      "MinLength" : "1"
-    },
-    "HostedZoneId" : {
-      "Description" : "ID of the Route53 hosted zone for DNS entries. See documentation.",
-      "Type" : "String",
-      "MinLength" : "1"
-    },
-    "TTL" : {
-      "Description" : "Time in seconds to cache objects. Set this low for a test/staging site, high for production",
-      "Type" : "Number", 
-      "MinValue" : "0" ,
-      "MaxValue" : "2592000",
-      "Default" : "3600"
-    }
-  },
-
-  "Conditions" : {
-    "redirect" : {"Fn::NotEquals" : [{"Ref" : "redirectURL" }, ""]}
-  },
-
-  "Resources" : {
-     "siteS3" : {
-      "Type" : "AWS::S3::Bucket",
-      "Properties" : {
-        "VersioningConfiguration" : { "Status" : "Enabled" },
-        "WebsiteConfiguration" : { "IndexDocument" : "index.html" } ,
-        "Tags" : [ {
-          "Key" : "Name",
-          "Value" : { "Ref" : "SiteURL" }
-        } ]
-      }
-    },
-    "BucketPublicReadPolicy" : {
-      "Type" : "AWS::S3::BucketPolicy",
-      "Properties" : {
-        "PolicyDocument": {
-          "Id"           : "Grant access to all account users",
-          "Statement"    : [{
-            "Sid"        : "AllowPublicRead",
-            "Action"     : ["s3:GetObject"],
-            "Effect"     : "Allow",
-            "Resource"   : { "Fn::Join" : ["", ["arn:aws:s3:::", {"Ref" : "siteS3"}, "/*" ] ]},
-            "Principal"  : { "AWS": "*" }
-          }]
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "S3 & Cloudfront static website",
+    "Parameters": {
+        "SiteURL": {
+            "Description": "URL for the Site",
+            "Type": "String",
+            "Default": "www.mysite.com",
+            "MinLength": "1"
         },
-        "Bucket" : {"Ref" : "siteS3"}
-      }
-    },
-   "siteDistribution" : {
-    	"Type" : "AWS::CloudFront::Distribution",
-      "DependsOn" : "siteS3",
-   		"Properties" : {
-      		"DistributionConfig" : {
-          		"Origins" : [ {
-              		"DomainName": { "Fn::Join" : ["", [ {"Ref" : "siteS3"}, ".s3-website-us-east-1.amazonaws.com" ] ]},
-              		"Id" : { "Ref" : "SiteURL" },
-                  "CustomOriginConfig" : {
-                        "HTTPPort": "80",
-                        "HTTPSPort": "443",
-                        "OriginProtocolPolicy": "http-only"
-                    }
-          		} ],
-          		"Enabled" : "true",
-              "DefaultRootObject" : "index.html",
-          		"Comment" : "Website",
-          		"Aliases" : [ { "Ref" : "SiteURL" } ],
-          		"DefaultCacheBehavior" : {
-              		"TargetOriginId" : { "Ref" : "SiteURL" },
-                  "AllowedMethods" : [ "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT" ] , 
-                  "MinTTL" : { "Ref" : "TTL" },
-              		"ForwardedValues" : {
-                  		"QueryString" : "true"
-              		},
-              		"ViewerProtocolPolicy" : "redirect-to-https"
-          		},
-          	 "ViewerCertificate" : {
-				        "IamCertificateId" : { "Ref" : "CloudfrontSSLID" },
-				        "SslSupportMethod" : "sni-only",
-                "MinimumProtocolVersion" : "TLSv1"
-				      }
-      		  }
-		    }
-   	},
-    "ZoneApexRedirectBucket": {
-      "Type": "AWS::S3::Bucket",
-      "Condition": "redirect",
-      "Properties": {
-        "WebsiteConfiguration": {
-          "RedirectAllRequestsTo": {
-            "HostName": {"Ref":"SiteURL"} 
-          }
+        "redirectURL": {
+            "Description": "Optional URL to redirect to main URL. This is mainly used in production to redirect zone apex to www",
+            "Type": "String",
+            "Default": "mysite.com"
+        },
+        "CloudfrontSSLID": {
+            "Description": "ServerCertificateID of Cloudfront SSL Cert. See documentation",
+            "Type": "String"
+            
+        },
+        "HostedZoneId": {
+            "Description": "ID of the Route53 hosted zone for DNS entries. See documentation.",
+            "Type": "String"
+            
+        },
+        "TTL": {
+            "Description": "Time in seconds to cache objects. Set this low for a test/staging site, high for production",
+            "Type": "Number",
+            "MinValue": "0",
+            "MaxValue": "2592000",
+            "Default": "3600"
         }
-      }
     },
-    "RedirBucketPublicReadPolicy" : {
-      "Type" : "AWS::S3::BucketPolicy",
-      "Condition": "redirect",
-      "Properties" : {
-        "PolicyDocument": {
-          "Id"           : "Grant access to all account users",
-          "Statement"    : [{
-            "Sid"        : "AllowPublicRead",
-            "Action"     : ["s3:GetObject"],
-            "Effect"     : "Allow",
-            "Resource"   : { "Fn::Join" : ["", ["arn:aws:s3:::", {"Ref" : "ZoneApexRedirectBucket"}, "/*" ] ]},
-            "Principal"  : { "AWS": "*" }
-          }]
-        },
-        "Bucket" : {"Ref" : "ZoneApexRedirectBucket"}
-      }
+    "Conditions": {
+        "hasRedirect": {"Fn::Not" : [{"Fn::Equals": [{"Ref": "redirectURL"},""]}]},
+        "hasRoute53": {"Fn::Not" : [{"Fn::Equals": [{"Ref": "HostedZoneId"},""]}]},
+        "hasSSL": {"Fn::Not" : [{"Fn::Equals": [{"Ref": "CloudfrontSSLID"},""]}]},
+        "notHasSSL": {"Fn::Equals": [{"Ref": "CloudfrontSSLID"},""]}
     },
-   "redirectDistribution" : {
-      "Type" : "AWS::CloudFront::Distribution",
-      "Condition": "redirect",
-      "DependsOn" : "ZoneApexRedirectBucket",
-      "Properties" : {
-          "DistributionConfig" : {
-              "Origins" : [ {
-                  "DomainName": { "Fn::Join" : ["", [ {"Ref" : "ZoneApexRedirectBucket"}, ".s3-website-us-east-1.amazonaws.com" ] ]},
-                  "Id" : { "Ref" : "redirectURL" },
-                  "CustomOriginConfig" : {
-                        "HTTPPort": "80",
-                        "HTTPSPort": "443",
-                        "OriginProtocolPolicy": "http-only"
+    "Resources": {
+        "siteS3": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "VersioningConfiguration": {
+                    "Status": "Enabled"
+                },
+                "WebsiteConfiguration": {
+                    "IndexDocument": "index.html"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Ref": "SiteURL"
+                        }
                     }
-              } ],
-              "Enabled" : "true",
-              "Comment" : "Website",
-              "Aliases" : [ { "Ref" : "redirectURL" } ],
-              "DefaultCacheBehavior" : {
-                  "TargetOriginId" : { "Ref" : "redirectURL" },
-                  "AllowedMethods" : [ "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT" ] , 
-                  "MinTTL" : { "Ref" : "TTL" },
-                  "ForwardedValues" : {
-                      "QueryString" : "true"
-                  },
-                  "ViewerProtocolPolicy" : "allow-all"
-              },
-             "ViewerCertificate" : {
-                "IamCertificateId" : { "Ref" : "CloudfrontSSLID" },
-                "SslSupportMethod" : "sni-only",
-                "MinimumProtocolVersion" : "TLSv1"
-              }
+                ]
+            }
+        },
+        "BucketPublicReadPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Id": "Grant access to all account users",
+                    "Statement": [
+                        {
+                            "Sid": "AllowPublicRead",
+                            "Action": [
+                                "s3:GetObject"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "siteS3"
+                                        },
+                                        "/*"
+                                    ]
+                                ]
+                            },
+                            "Principal": {
+                                "AWS": "*"
+                            }
+                        }
+                    ]
+                },
+                "Bucket": {
+                    "Ref": "siteS3"
+                }
+            }
+        },
+
+        "siteDistributionSSL": {
+            "Type": "AWS::CloudFront::Distribution",
+            "Condition": "hasSSL",
+            "DependsOn": "siteS3",
+            "Properties": {
+                "DistributionConfig": {
+                    "Origins": [
+                        {
+                            "DomainName": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        {
+                                            "Ref": "siteS3"
+                                        },
+                                        ".s3-website-us-east-1.amazonaws.com"
+                                    ]
+                                ]
+                            },
+                            "Id": {
+                                "Ref": "SiteURL"
+                            },
+                            "CustomOriginConfig": {
+                                "HTTPPort": "80",
+                                "HTTPSPort": "443",
+                                "OriginProtocolPolicy": "http-only"
+                            }
+                        }
+                    ],
+                    "Enabled": "true",
+                    "DefaultRootObject": "index.html",
+                    "Comment": "Website",
+                    "Aliases": [
+                        {
+                            "Ref": "SiteURL"
+                        }
+                    ],
+                    "DefaultCacheBehavior": {
+                        "TargetOriginId": {
+                            "Ref": "SiteURL"
+                        },
+                        "AllowedMethods": [
+                            "DELETE",
+                            "GET",
+                            "HEAD",
+                            "OPTIONS",
+                            "PATCH",
+                            "POST",
+                            "PUT"
+                        ],
+                        "MinTTL": {
+                            "Ref": "TTL"
+                        },
+                        "ForwardedValues": {
+                            "QueryString": "true"
+                        },
+                        "ViewerProtocolPolicy": "redirect-to-https"
+                    },
+                    "ViewerCertificate": {
+                        "IamCertificateId": {
+                            "Ref": "CloudfrontSSLID"
+                        },
+                        "SslSupportMethod": "sni-only",
+                        "MinimumProtocolVersion": "TLSv1"
+                    }
+                }
+            }
+        },
+        "siteDistributionNoSSL": {
+            "Type": "AWS::CloudFront::Distribution",
+            "Condition": "notHasSSL",
+            "DependsOn": "siteS3",
+            "Properties": {
+                "DistributionConfig": {
+                    "Origins": [
+                        {
+                            "DomainName": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        {
+                                            "Ref": "siteS3"
+                                        },
+                                        ".s3-website-us-east-1.amazonaws.com"
+                                    ]
+                                ]
+                            },
+                            "Id": {
+                                "Ref": "SiteURL"
+                            },
+                            "CustomOriginConfig": {
+                                "HTTPPort": "80",
+                                "HTTPSPort": "443",
+                                "OriginProtocolPolicy": "http-only"
+                            }
+                        }
+                    ],
+                    "Enabled": "true",
+                    "DefaultRootObject": "index.html",
+                    "Comment": "Website",
+                    "Aliases": [
+                        {
+                            "Ref": "SiteURL"
+                        }
+                    ],
+                    "DefaultCacheBehavior": {
+                        "TargetOriginId": {
+                            "Ref": "SiteURL"
+                        },
+                        "AllowedMethods": [
+                            "DELETE",
+                            "GET",
+                            "HEAD",
+                            "OPTIONS",
+                            "PATCH",
+                            "POST",
+                            "PUT"
+                        ],
+                        "MinTTL": {
+                            "Ref": "TTL"
+                        },
+                        "ForwardedValues": {
+                            "QueryString": "true"
+                        },
+                        "ViewerProtocolPolicy": "allow-all"
+                    }
+                }
+            }
+        },
+        "ZoneApexRedirectBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Condition": "hasRedirect",
+            "Properties": {
+                "WebsiteConfiguration": {
+                    "RedirectAllRequestsTo": {
+                        "HostName": {
+                            "Ref": "SiteURL"
+                        }
+                    }
+                }
+            }
+        },
+        "RedirBucketPublicReadPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Condition": "hasRedirect",
+            "Properties": {
+                "PolicyDocument": {
+                    "Id": "Grant access to all account users",
+                    "Statement": [
+                        {
+                            "Sid": "AllowPublicRead",
+                            "Action": [
+                                "s3:GetObject"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "ZoneApexRedirectBucket"
+                                        },
+                                        "/*"
+                                    ]
+                                ]
+                            },
+                            "Principal": {
+                                "AWS": "*"
+                            }
+                        }
+                    ]
+                },
+                "Bucket": {
+                    "Ref": "ZoneApexRedirectBucket"
+                }
+            }
+        },
+        "redirectDistribution": {
+            "Type": "AWS::CloudFront::Distribution",
+            "Condition": "hasRedirect",
+            "DependsOn": "ZoneApexRedirectBucket",
+            "Properties": {
+                "DistributionConfig": {
+                    "Origins": [
+                        {
+                            "DomainName": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        {
+                                            "Ref": "ZoneApexRedirectBucket"
+                                        },
+                                        ".s3-website-us-east-1.amazonaws.com"
+                                    ]
+                                ]
+                            },
+                            "Id": {
+                                "Ref": "redirectURL"
+                            },
+                            "CustomOriginConfig": {
+                                "HTTPPort": "80",
+                                "HTTPSPort": "443",
+                                "OriginProtocolPolicy": "http-only"
+                            }
+                        }
+                    ],
+                    "Enabled": "true",
+                    "Comment": "Website",
+                    "Aliases": [
+                        {
+                            "Ref": "redirectURL"
+                        }
+                    ],
+                    "DefaultCacheBehavior": {
+                        "TargetOriginId": {
+                            "Ref": "redirectURL"
+                        },
+                        "AllowedMethods": [
+                            "DELETE",
+                            "GET",
+                            "HEAD",
+                            "OPTIONS",
+                            "PATCH",
+                            "POST",
+                            "PUT"
+                        ],
+                        "MinTTL": {
+                            "Ref": "TTL"
+                        },
+                        "ForwardedValues": {
+                            "QueryString": "true"
+                        },
+                        "ViewerProtocolPolicy": "allow-all"
+                    },
+                    "ViewerCertificate": {
+                        "IamCertificateId": {
+                            "Ref": "CloudfrontSSLID"
+                        },
+                        "SslSupportMethod": "sni-only",
+                        "MinimumProtocolVersion": "TLSv1"
+                    }
+                }
+            }
+        },
+        "myuser": {
+            "Type": "AWS::IAM::User",
+            "Properties": {
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": "cloudfront-s3-readwrite",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "cloudfront:CreateInvalidation"
+                                    ],
+                                    "Resource": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:ListBucket"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:s3:::",
+                                                    {
+                                                        "Ref": "siteS3"
+                                                    }
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:DeleteObject",
+                                        "s3:GetObject",
+                                        "s3:GetObjectAcl",
+                                        "s3:PutObject",
+                                        "s3:PutObjectAcl"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:s3:::",
+                                                    {
+                                                        "Ref": "siteS3"
+                                                    },
+                                                    "/*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "siteDNS": {
+            "Type": "AWS::Route53::RecordSet",
+            "Condition": "hasRoute53",
+            "Properties": {
+                "HostedZoneId": {
+                    "Ref": "HostedZoneId"
+                },
+                "Comment": "A Alias targeted to Cloudfront Distribution.",
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "SiteURL"
+                            },
+                            "."
+                        ]
+                    ]
+                },
+                "Type": "A",
+                "AliasTarget": {
+                    "DNSName": {
+                        "Fn::If": [
+                          "hasSSL",
+                          {"Fn::GetAtt": [
+                              "siteDistributionSSL",
+                              "DomainName"
+                          ]},
+                          {"Fn::GetAtt": [
+                              "siteDistributionNoSSL",
+                              "DomainName"
+                          ]}
+                        ]
+                    },
+                    "HostedZoneId": {
+                        "Ref": "HostedZoneId"
+                    }
+                }
+            }
+        },
+        "redirDNS": {
+            "Type": "AWS::Route53::RecordSet",
+            "Condition": "hasRedirect",
+            "Properties": {
+                "HostedZoneId": {
+                    "Ref": "HostedZoneId"
+                },
+                "Comment": "A Alias targeted to Cloudfront Distribution.",
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "redirectURL"
+                            },
+                            "."
+                        ]
+                    ]
+                },
+                "Type": "A",
+                "AliasTarget": {
+                    "DNSName": {
+                        "Fn::GetAtt": [
+                            "redirectDistribution",
+                            "DomainName"
+                        ]
+                    },
+                    "HostedZoneId": {
+                        "Ref": "HostedZoneId"
+                    }
+                }
             }
         }
-    },
-    "myuser" : {
-        "Type" : "AWS::IAM::User",
-        "Properties" : {
-          "Path" : "/",
-          "Policies" : [ {
-              "PolicyName" : "cloudfront-s3-readwrite",
-              "PolicyDocument" : {
-                "Version": "2012-10-17",
-                "Statement": [
-                  {
-                    "Effect": "Allow",
-                    "Action": [ "cloudfront:CreateInvalidation" ],
-                    "Resource": [ "*" ]
-                  },
-                  {
-                    "Effect": "Allow",
-                    "Action": [ "s3:ListBucket" ],
-                    "Resource": [ { "Fn::Join" : [ "", [ "arn:aws:s3:::", { "Ref" : "siteS3" } ] ] } ]
-                  },
-                  {
-                    "Effect": "Allow",
-                    "Action": [
-                      "s3:DeleteObject",
-                      "s3:GetObject",
-                      "s3:GetObjectAcl",
-                      "s3:PutObject",
-                      "s3:PutObjectAcl"
-                    ],
-                    "Resource": [ { "Fn::Join" : [ "", [ "arn:aws:s3:::", { "Ref" : "siteS3" }, "/*" ] ] } ]
-                  }
-                ]
-              }
-            } ]
-        }
-    } ,
-  	"siteDNS" : {
-        "Type" : "AWS::Route53::RecordSet",
-        "Properties" : {
-          "HostedZoneId" : { "Ref" : "HostedZoneId" },
-          "Comment" : "A Alias targeted to Cloudfront Distribution.",
-          "Name" : { "Fn::Join" : [ "", [ { "Ref" : "SiteURL" }, "." ] ] },
-          "Type" : "A",
-          "AliasTarget" : {
-              "DNSName" : { "Fn::GetAtt" : ["siteDistribution","DomainName"] },
-              "HostedZoneId" : { "Ref" : "HostedZoneId" }
-          }
-        }
-     },
-    "redirDNS" : {
-        "Type" : "AWS::Route53::RecordSet",
-        "Condition": "redirect",
-        "Properties" : {
-          "HostedZoneId" : { "Ref" : "HostedZoneId" },
-          "Comment" : "A Alias targeted to Cloudfront Distribution.",
-          "Name" : { "Fn::Join" : [ "", [ { "Ref" : "redirectURL" }, "." ] ] },
-          "Type" : "A",
-          "AliasTarget" : {
-              "DNSName" : { "Fn::GetAtt" : ["redirectDistribution","DomainName"] },
-              "HostedZoneId" : { "Ref" : "HostedZoneId" }
-          }
-        }
-     }
-  }
+    }
 }
