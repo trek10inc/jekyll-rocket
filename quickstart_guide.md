@@ -17,7 +17,7 @@ Alternatively, here's are the cliffnotes version.
 
 Once you have Vagrant up and running, we can get started with the real work!
 
-Clone this repository to your local machine. (Either with the GitHub app or via `git clone https://github.com/trek10inc/rocketplatform-jekyll` )
+Clone this repository to your local machine. (Either with the GitHub app or via `git clone https://github.com/trek10inc/jekyll-rocket` )
 
 Navigate to that directory and run  
 `vagrant up`
