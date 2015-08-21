@@ -31,13 +31,24 @@
             "Default": "3600"
         }
     },
+
     "Conditions": {
         "hasRedirect": {"Fn::Not" : [{"Fn::Equals": [{"Ref": "redirectURL"},""]}]},
         "hasRoute53": {"Fn::Not" : [{"Fn::Equals": [{"Ref": "HostedZoneId"},""]}]},
         "hasSSL": {"Fn::Not" : [{"Fn::Equals": [{"Ref": "CloudfrontSSLID"},""]}]},
-        "notHasSSL": {"Fn::Equals": [{"Ref": "CloudfrontSSLID"},""]}
+        "notHasSSL": {"Fn::Equals": [{"Ref": "CloudfrontSSLID"},""]},
+        "hasRedirectSSL": {"Fn::And" : [
+                            {"Fn::Not" : [{"Fn::Equals": [{"Ref": "CloudfrontSSLID"},""]}]}, 
+                            {"Fn::Not" : [{"Fn::Equals": [{"Ref": "redirectURL"},""]}]}
+                           ]},
+        "notHasRedirectSSL": {"Fn::And" : [
+                            {"Fn::Equals": [{"Ref": "CloudfrontSSLID"},""]}, 
+                            {"Fn::Not" : [{"Fn::Equals": [{"Ref": "redirectURL"},""]}]}
+                           ]}
     },
+
     "Resources": {
+
         "siteS3": {
             "Type": "AWS::S3::Bucket",
             "Properties": {
@@ -57,6 +68,7 @@
                 ]
             }
         },
+
         "BucketPublicReadPolicy": {
             "Type": "AWS::S3::BucketPolicy",
             "Properties": {
@@ -69,18 +81,7 @@
                                 "s3:GetObject"
                             ],
                             "Effect": "Allow",
-                            "Resource": {
-                                "Fn::Join": [
-                                    "",
-                                    [
-                                        "arn:aws:s3:::",
-                                        {
-                                            "Ref": "siteS3"
-                                        },
-                                        "/*"
-                                    ]
-                                ]
-                            },
+                            "Resource": {"Fn::Join": ["",["arn:aws:s3:::",{"Ref": "siteS3"},"/*"]]},
                             "Principal": {
                                 "AWS": "*"
                             }
@@ -101,17 +102,7 @@
                 "DistributionConfig": {
                     "Origins": [
                         {
-                            "DomainName": {
-                                "Fn::Join": [
-                                    "",
-                                    [
-                                        {
-                                            "Ref": "siteS3"
-                                        },
-                                        ".s3-website-us-east-1.amazonaws.com"
-                                    ]
-                                ]
-                            },
+                            "DomainName": {"Fn::Join": ["",[{"Ref": "siteS3"},".s3-website-us-east-1.amazonaws.com"]]},
                             "Id": {
                                 "Ref": "SiteURL"
                             },
@@ -161,6 +152,7 @@
                 }
             }
         },
+
         "siteDistributionNoSSL": {
             "Type": "AWS::CloudFront::Distribution",
             "Condition": "notHasSSL",
@@ -169,17 +161,7 @@
                 "DistributionConfig": {
                     "Origins": [
                         {
-                            "DomainName": {
-                                "Fn::Join": [
-                                    "",
-                                    [
-                                        {
-                                            "Ref": "siteS3"
-                                        },
-                                        ".s3-website-us-east-1.amazonaws.com"
-                                    ]
-                                ]
-                            },
+                            "DomainName": {"Fn::Join": ["",[{"Ref": "siteS3"},".s3-website-us-east-1.amazonaws.com"]]},
                             "Id": {
                                 "Ref": "SiteURL"
                             },
@@ -222,7 +204,8 @@
                 }
             }
         },
-        "ZoneApexRedirectBucket": {
+
+        "RedirectBucket": {
             "Type": "AWS::S3::Bucket",
             "Condition": "hasRedirect",
             "Properties": {
@@ -235,6 +218,7 @@
                 }
             }
         },
+
         "RedirBucketPublicReadPolicy": {
             "Type": "AWS::S3::BucketPolicy",
             "Condition": "hasRedirect",
@@ -248,51 +232,27 @@
                                 "s3:GetObject"
                             ],
                             "Effect": "Allow",
-                            "Resource": {
-                                "Fn::Join": [
-                                    "",
-                                    [
-                                        "arn:aws:s3:::",
-                                        {
-                                            "Ref": "ZoneApexRedirectBucket"
-                                        },
-                                        "/*"
-                                    ]
-                                ]
-                            },
-                            "Principal": {
-                                "AWS": "*"
-                            }
+                            "Resource": {"Fn::Join": ["",["arn:aws:s3:::",{"Ref": "RedirectBucket"},"/*"]]},
+                            "Principal": { "AWS": "*" }
                         }
                     ]
                 },
                 "Bucket": {
-                    "Ref": "ZoneApexRedirectBucket"
+                    "Ref": "RedirectBucket"
                 }
             }
         },
-        "redirectDistribution": {
+
+        "redirectDistributionSSL": {
             "Type": "AWS::CloudFront::Distribution",
-            "Condition": "hasRedirect",
-            "DependsOn": "ZoneApexRedirectBucket",
+            "Condition": "hasRedirectSSL",
+            "DependsOn": "RedirectBucket",
             "Properties": {
                 "DistributionConfig": {
                     "Origins": [
                         {
-                            "DomainName": {
-                                "Fn::Join": [
-                                    "",
-                                    [
-                                        {
-                                            "Ref": "ZoneApexRedirectBucket"
-                                        },
-                                        ".s3-website-us-east-1.amazonaws.com"
-                                    ]
-                                ]
-                            },
-                            "Id": {
-                                "Ref": "redirectURL"
-                            },
+                            "DomainName": {"Fn::Join": ["",[{"Ref": "RedirectBucket"},".s3-website-us-east-1.amazonaws.com"]]},
+                            "Id": { "Ref": "redirectURL" },
                             "CustomOriginConfig": {
                                 "HTTPPort": "80",
                                 "HTTPSPort": "443",
@@ -302,15 +262,9 @@
                     ],
                     "Enabled": "true",
                     "Comment": "Website",
-                    "Aliases": [
-                        {
-                            "Ref": "redirectURL"
-                        }
-                    ],
+                    "Aliases": [{ "Ref": "redirectURL" }],
                     "DefaultCacheBehavior": {
-                        "TargetOriginId": {
-                            "Ref": "redirectURL"
-                        },
+                        "TargetOriginId": { "Ref": "redirectURL" },
                         "AllowedMethods": [
                             "DELETE",
                             "GET",
@@ -338,7 +292,49 @@
                 }
             }
         },
-        "myuser": {
+
+        "redirectDistributionNoSSL": {
+            "Type": "AWS::CloudFront::Distribution",
+            "Condition": "notHasRedirectSSL",
+            "DependsOn": "RedirectBucket",
+            "Properties": {
+                "DistributionConfig": {
+                    "Origins": [
+                        {
+                            "DomainName": {"Fn::Join": ["",[{"Ref": "RedirectBucket"},".s3-website-us-east-1.amazonaws.com"]]},
+                            "Id": { "Ref": "redirectURL"},
+                            "CustomOriginConfig": {
+                                "HTTPPort": "80",
+                                "HTTPSPort": "443",
+                                "OriginProtocolPolicy": "http-only"
+                            }
+                        }
+                    ],
+                    "Enabled": "true",
+                    "Comment": "Website",
+                    "Aliases": [{ "Ref": "redirectURL"}],
+                    "DefaultCacheBehavior": {
+                        "TargetOriginId": {
+                            "Ref": "redirectURL"
+                        },
+                        "AllowedMethods": [
+                            "DELETE",
+                            "GET",
+                            "HEAD",
+                            "OPTIONS",
+                            "PATCH",
+                            "POST",
+                            "PUT"
+                        ],
+                        "MinTTL": { "Ref": "TTL" },
+                        "ForwardedValues": { "QueryString": "true" },
+                        "ViewerProtocolPolicy": "allow-all"
+                    }
+                }
+            }
+        },
+
+        "jekyllRocketUser": {
             "Type": "AWS::IAM::User",
             "Properties": {
                 "Path": "/",
@@ -362,19 +358,7 @@
                                     "Action": [
                                         "s3:ListBucket"
                                     ],
-                                    "Resource": [
-                                        {
-                                            "Fn::Join": [
-                                                "",
-                                                [
-                                                    "arn:aws:s3:::",
-                                                    {
-                                                        "Ref": "siteS3"
-                                                    }
-                                                ]
-                                            ]
-                                        }
-                                    ]
+                                    "Resource": [{"Fn::Join": ["",["arn:aws:s3:::",{"Ref": "siteS3"}]]}]
                                 },
                                 {
                                     "Effect": "Allow",
@@ -385,20 +369,7 @@
                                         "s3:PutObject",
                                         "s3:PutObjectAcl"
                                     ],
-                                    "Resource": [
-                                        {
-                                            "Fn::Join": [
-                                                "",
-                                                [
-                                                    "arn:aws:s3:::",
-                                                    {
-                                                        "Ref": "siteS3"
-                                                    },
-                                                    "/*"
-                                                ]
-                                            ]
-                                        }
-                                    ]
+                                    "Resource": [{"Fn::Join": ["",["arn:aws:s3:::",{"Ref": "siteS3"},"/*"]]}]
                                 }
                             ]
                         }
@@ -406,76 +377,45 @@
                 ]
             }
         },
+
         "siteDNS": {
             "Type": "AWS::Route53::RecordSet",
             "Condition": "hasRoute53",
             "Properties": {
-                "HostedZoneId": {
-                    "Ref": "HostedZoneId"
-                },
+                "HostedZoneId": { "Ref": "HostedZoneId" },
                 "Comment": "A Alias targeted to Cloudfront Distribution.",
-                "Name": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "SiteURL"
-                            },
-                            "."
-                        ]
-                    ]
-                },
+                "Name": {"Fn::Join": ["",[{"Ref": "SiteURL"},"."]]},
                 "Type": "A",
                 "AliasTarget": {
                     "DNSName": {
                         "Fn::If": [
-                          "hasSSL",
-                          {"Fn::GetAtt": [
-                              "siteDistributionSSL",
-                              "DomainName"
-                          ]},
-                          {"Fn::GetAtt": [
-                              "siteDistributionNoSSL",
-                              "DomainName"
-                          ]}
+                            "hasSSL",
+                            {"Fn::GetAtt": ["siteDistributionSSL","DomainName" ] },
+                            {"Fn::GetAtt": ["siteDistributionNoSSL","DomainName"] }
                         ]
                     },
-                    "HostedZoneId": {
-                        "Ref": "HostedZoneId"
-                    }
+                    "HostedZoneId" : "Z2FDTNDATAQYW2"
                 }
             }
         },
-        "redirDNS": {
+
+        "redirectDNS": {
             "Type": "AWS::Route53::RecordSet",
             "Condition": "hasRedirect",
             "Properties": {
-                "HostedZoneId": {
-                    "Ref": "HostedZoneId"
-                },
+                "HostedZoneId": { "Ref": "HostedZoneId" },
                 "Comment": "A Alias targeted to Cloudfront Distribution.",
-                "Name": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "redirectURL"
-                            },
-                            "."
-                        ]
-                    ]
-                },
+                "Name": {"Fn::Join": ["",[{"Ref": "redirectURL"},"."]]},
                 "Type": "A",
                 "AliasTarget": {
                     "DNSName": {
-                        "Fn::GetAtt": [
-                            "redirectDistribution",
-                            "DomainName"
+                        "Fn::If": [
+                            "hasSSL",
+                            {"Fn::GetAtt": ["redirectDistributionSSL","DomainName"] },
+                            {"Fn::GetAtt": ["redirectDistributionNoSSL","DomainName"]}
                         ]
                     },
-                    "HostedZoneId": {
-                        "Ref": "HostedZoneId"
-                    }
+                    "HostedZoneId" : "Z2FDTNDATAQYW2"
                 }
             }
         }
