@@ -35,7 +35,7 @@ So just to review, that's $15/mo to serve up 1M page views per month on a massiv
 
 ### Batteries Included
 
-We spent a lot of time thinking, expirementing, and making things as straight forward as possible. Read through the quickstart guide, check out the screencast, even email us for help rocketplatform@trek10.com.  
+We spent a lot of time thinking, expirementing, and making things as straight forward as possible. Read through the quickstart guide, and check out the screencast.
   
 You just have to plug in a few configurations here and there (Don't worry, we even tell you where to get the values for the configs), and away you go.
 
