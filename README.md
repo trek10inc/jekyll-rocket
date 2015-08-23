@@ -17,7 +17,7 @@ At Trek10, we wanted to upgrade from an overpowered, under utilized and somewhat
 - Delivers Blazing Fast Websites
 - Affordable
 - Maintainable
-- [Getting Started Screencast](https://youtu.be/IcF3XCxpgtw) (https://youtu.be/IcF3XCxpgtw)
+- [Getting Started Screencast](https://youtu.be/6dwMlNDph_I) (https://youtu.be/6dwMlNDph_I)
 
 NOTE: _We do recommend that you or your developers have some familiarity with the command line, but you don't gotta be a sysops with a decade of expereince. (Okay... you really just need to be able to copy paste.) Mostly just know how to open your terminal or cmd prompt._  
 

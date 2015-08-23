@@ -2,12 +2,12 @@
 
 
 <p align="center">
-    <a href="https://youtu.be/IcF3XCxpgtw" alt="Jekyll Rocket Screencast">
+    <a href="https://youtu.be/6dwMlNDph_I" alt="Jekyll Rocket Screencast">
         <img src="screencast_thumbnail.png?raw=true" />
     </a>
 </p>
 
-If you are a visual learner, [check out the Getting Started Screencast](https://youtu.be/IcF3XCxpgtw) (https://youtu.be/IcF3XCxpgtw)! 
+If you are a visual learner, [check out the Getting Started Screencast](https://youtu.be/6dwMlNDph_I) (https://youtu.be/6dwMlNDph_I)! 
 
 ## Setting up your Development Machine
 
