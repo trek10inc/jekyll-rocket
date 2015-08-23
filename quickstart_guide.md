@@ -1,6 +1,13 @@
 # Jekyll Rocket Quickstart Guide
 
 
+<p align="center">
+    <a href="https://youtu.be/IcF3XCxpgtw" alt="Jekyll Rocket Screencast">
+        <img src="screencast_thumbnail.png?raw=true" />
+    </a>
+</p>
+
+If you are a visual learner, [check out the Getting Started Screencast](https://youtu.be/IcF3XCxpgtw) (https://youtu.be/IcF3XCxpgtw)! 
 
 ## Setting up your Development Machine
 
