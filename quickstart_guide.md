@@ -57,7 +57,7 @@ develop-website
 
 ## Setting up AWS 
 
-The easiest way to set things up in AWS to to use the provided CloudFormation template.
+The easiest way to set things up in AWS is to use the provided CloudFormation template.
 Check out [CloudFormation ReadMe](../master/cloudformation-readme.md).
 
 ## Deployments
