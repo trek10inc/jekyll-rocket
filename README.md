@@ -17,7 +17,7 @@ At Trek10, we wanted to upgrade from an overpowered, under utilized and somewhat
 - Delivers Blazing Fast Websites
 - Affordable
 - Maintainable
-- Screencasts
+- [Getting Started Screencast](https://www.youtube.com/watch?v=IcF3XCxpgtw) (https://www.youtube.com/watch?v=IcF3XCxpgtw)
 
 NOTE: _We do recommend that you or your developers have some familiarity with the command line, but you don't gotta be a sysops with a decade of expereince. (Okay... you really just need to be able to copy paste.) Mostly just know how to open your terminal or cmd prompt._  
 
@@ -76,17 +76,13 @@ Checkout the [QuickStart Guide to get yourself](../master/quickstart_guide.md) u
 
 ## Need Help?
 
-Create a GitHub issue
+[Create a New GitHub issue](https://github.com/trek10inc/jekyll-rocket/issues/new)
 
 ## TODO (aka: We should do this, but wouldn't complain if someone else did)
 
 
-- Image Optmization / Sane Default Configs
-- Screencast
-  - Vagrant
-  - AWS
-  - Jekyll
-- Easy Theme Selector / Setup
+- Good Image Optmization / Sane Default Configs
+- Easy Theme Selector
 
 
 ## Contributing
