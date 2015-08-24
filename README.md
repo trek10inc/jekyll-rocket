@@ -19,11 +19,11 @@ At Trek10, we wanted to upgrade from an overpowered, under utilized and somewhat
 - Maintainable
 - [Getting Started Screencast](https://youtu.be/6dwMlNDph_I) (https://youtu.be/6dwMlNDph_I)
 
-NOTE: _We do recommend that you or your developers have some familiarity with the command line, but you don't gotta be a sysops with a decade of expereince. (Okay... you really just need to be able to copy paste.) Mostly just know how to open your terminal or cmd prompt._  
+NOTE: _We do recommend that you or your developers have some familiarity with the command line, but you don't gotta be a sysops with a decade of experience. (Okay... you really just need to be able to copy paste.) Mostly just know how to open your terminal or cmd prompt._  
 
 ### Cost Analysis
 
-Running even a tiny traditional CMS like Wordpress or Drupal will cost at least $20/mo in AWS. And that gives you almost no resources... any reasonable traffic will quickly max it out. It will also give you no redundancy. When you starting adding all of that together, you can easily spend $50/mo, $100/mo, or more running a scalable and highly available CMS infrastructure. Not to mention the setup time... if you're not an AWS expert, that could take you days or weeks to set up correctly.
+Running even a tiny traditional CMS like Wordpress or Drupal will cost at least $20/mo in AWS. And that gives you almost no resources... any reasonable traffic will quickly max it out. It will also give you no redundancy. When you start adding all of that together, you can easily spend $50/mo, $100/mo, or more running a scalable and highly available CMS infrastructure. Not to mention the setup time... if you're not an AWS expert, that could take you days or weeks to set up correctly.
 
 This Jekyll rocket platform is:
 - Turnkey to set up: Just run the Cloudformation template and it's built
@@ -35,7 +35,7 @@ So just to review, that's $15/mo to serve up 1M page views per month on a massiv
 
 ### Batteries Included
 
-We spent a lot of time thinking, expirementing, and making things as straight forward as possible. Read through the quickstart guide, and check out the screencast.
+We spent a lot of time thinking, experimenting, and making things as straight forward as possible. Read through the quickstart guide, and check out the screencast.
   
 You just have to plug in a few configurations here and there (Don't worry, we even tell you where to get the values for the configs), and away you go.
 
